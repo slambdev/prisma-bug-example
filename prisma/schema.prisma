@@ -1,0 +1,40 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    output          = "../node_modules/.prisma/client"
+    previewFeatures = ["interactiveTransactions"]
+}
+
+model Foo {
+    uid               String   @id @default(uuid())
+    creationTimestamp DateTime @default(now())
+    name              String
+    version           String
+    bars              Bar[]
+
+    @@unique([name, version], name: "fooFullyQualifiedName")
+}
+
+model Bar {
+    uid    String  @id @default(uuid())
+    baz    Baz     @relation(fields: [bazUid], references: [uid])
+    bazUid String
+    name   String
+    Foo    Foo?    @relation(fields: [fooUid], references: [uid])
+    fooUid String?
+}
+
+model Baz {
+    uid               String   @id @default(uuid())
+    creationTimestamp DateTime @default(now())
+    name              String
+    version           String
+
+    bar Bar[]
+
+    @@unique([name, version], name: "bazFullyQualifiedName")
+}
